@@ -1,0 +1,54 @@
+name: Build and release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Notes source
+        uses: actions/checkout@v6
+
+      - name: Resolve hs-kobo-backup version
+        id: backup
+        shell: bash
+        run: |
+          backup_tag=$(tr -d '[:space:]' < HS_KOBO_BACKUP_VERSION)
+          if [[ ! "${backup_tag}" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "Invalid hs-kobo-backup tag: ${backup_tag}" >&2
+            exit 1
+          fi
+          echo "tag=${backup_tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout hs-kobo-backup
+        uses: actions/checkout@v6
+        with:
+          repository: hsuan9522/hs-kobo-backup
+          ref: ${{ steps.backup.outputs.tag }}
+          path: vendor/hs-kobo-backup
+
+      - name: Build KoboRoot.tgz
+        env:
+          PACKAGE_VERSION: ${{ github.ref_name }}
+          BACKUP_VERSION: ${{ steps.backup.outputs.tag }}
+        shell: bash
+        run: ./build.sh
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_TAG: ${{ steps.backup.outputs.tag }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "dist/KoboRoot.tgz" \
+            --verify-tag \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Includes hs-kobo-backup ${BACKUP_TAG} components."

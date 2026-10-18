@@ -1,20 +1,29 @@
 #!/bin/sh
+set -eu
 
-FOLDER="/mnt/onboard/.adds/utils"
-EXPORT_FOLDER="/mnt/onboard/note"
-EXPORT="$EXPORT_FOLDER/notes.md"
-
-SQLITE="${FOLDER}/sqlite3"
-MY_DB="${FOLDER}/notes/Bookmark.sqlite"
-
-LD_LIBRARY_PATH="${FOLDER}/lib:${LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
-
-$SQLITE "$MY_DB" "DELETE FROM Bookmark WHERE ROWID = (SELECT MAX(ROWID) FROM Bookmark);"
+# === dev ===
+# . ./env.sh
+# === end ===
 
 
-# 顯示
-SQL="SELECT 
+. /mnt/onboard/.adds/nickel-hs/notes/env.sh
+
+
+showStatus "Writing to Markdown..."
+
+echo "# Kobo Notes" > $EXPORT_NAME
+
+
+SQL="WITH LatestBookmarks AS (
+  SELECT 
+    VolumeID,
+    MAX(dateCreated) AS latest_date
+  FROM Bookmark
+  WHERE Type = 'highlight' OR Type = 'note'
+  GROUP BY VolumeID
+)
+
+SELECT 
   CASE 
     -- 當這是該書（title）的第一筆記錄，才顯示 title
     WHEN NOT EXISTS (
@@ -23,12 +32,12 @@ SQL="SELECT
       WHERE prev.VolumeID = b.VolumeID 
         AND prev.dateCreated < b.dateCreated
         AND prev.Type != 'dogear'
-    ) THEN '### ' || b.title || char(10)
+    ) THEN char(10) || '### ' || b.title || char(10)
     ELSE ''
   END ||
 
   CASE 
-    -- 當 `b.dateCreated` 轉為 `YYYY-MM-DD` 且與前一條不同時，顯示日期
+    -- 當 b.dateCreated 轉為 YYYY-MM-DD 且與前一條不同時，顯示日期
     WHEN NOT EXISTS (
       SELECT 1 FROM Bookmark prev 
       WHERE prev.VolumeID = b.VolumeID 
@@ -48,16 +57,8 @@ SQL="SELECT
   END AS formatted_output
 
 FROM Bookmark b
-JOIN (
-  SELECT 
-    VolumeID,
-    MAX(dateCreated) AS latest_date
-  FROM Bookmark
-  WHERE Type = 'highlight' OR Type = 'note'
-  GROUP BY VolumeID
-) lb ON b.VolumeID = lb.VolumeID
+JOIN LatestBookmarks lb ON b.VolumeID = lb.VolumeID
 WHERE b.Type = 'highlight' OR b.Type = 'note'
-ORDER BY lb.latest_date DESC, b.title, b.dateCreated;
-"
+ORDER BY lb.latest_date DESC, b.title, b.dateCreated;"
 
-$SQLITE "$MY_DB" "$SQL" >> $EXPORT
+$SQLITE "$MY_DB" "$SQL" >> $EXPORT_NAME

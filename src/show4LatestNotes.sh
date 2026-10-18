@@ -1,13 +1,6 @@
 #!/bin/sh
 
-FOLDER="/mnt/onboard/.adds/utils"
-EXPORT="$EXPORT_FOLDER/notes.md"
-
-SQLITE="${FOLDER}/sqlite3"
-MY_DB="${FOLDER}/notes/Bookmark.sqlite"
-
-LD_LIBRARY_PATH="${FOLDER}/lib:${LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
+. /mnt/onboard/.adds/nickel-hs/notes/env.sh
 
 # 查詢最新的四筆高亮資料並格式化輸出
 data=$($SQLITE "$MY_DB" <<EOF

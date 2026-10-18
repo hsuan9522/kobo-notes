@@ -1,0 +1,13 @@
+menu_item   :main   :筆記           :cmd_spawn        :quiet:/mnt/onboard/.adds/nickel-hs/notes/markdownToTxt.sh
+    chain_success    :nickel_misc          :rescan_books
+    chain_success    :nickel_open          :library:all
+
+menu_item   :reader   :查看筆記           :cmd_output        :500:/bin/sh -c /mnt/onboard/.adds/nickel-hs/notes/show4LatestNotes.sh
+
+menu_item   :selection   :查看筆記           :cmd_output        :500:/bin/sh -c /mnt/onboard/.adds/nickel-hs/notes/show4LatestNotes.sh
+menu_item   :selection   :儲存句子     :cmd_spawn      :quiet:/mnt/onboard/.adds/nickel-hs/backup/syncBookmarks.sh
+    chain_success                     :cmd_spawn      :quiet:/mnt/onboard/.adds/nickel-hs/notes/dbToMarkdown.sh
+    chain_failure                       :dbg_toast          :Error
+menu_item   :selection :刪除句子       :cmd_spawn          :quiet:/mnt/onboard/.adds/nickel-hs/notes/removeLatestNote.sh
+    chain_success                     :cmd_spawn      :quiet:/mnt/onboard/.adds/nickel-hs/notes/dbToMarkdown.sh
+    chain_failure                       :dbg_toast          :Error
