@@ -48,6 +48,7 @@ cp -p "$PROJECT_DIR/src/dbToMarkdown.sh" "$NOTES_DIR/"
 cp -p "$PROJECT_DIR/src/markdownToTxt.sh" "$NOTES_DIR/"
 cp -p "$PROJECT_DIR/src/removeLatestNote.sh" "$NOTES_DIR/"
 cp -p "$PROJECT_DIR/src/show4LatestNotes.sh" "$NOTES_DIR/"
+cp -R "$PROJECT_DIR/lib" "$NOTES_DIR/"
 
 # Notes uses the shared backup database and bookmark sync command.
 cp -p "$BACKUP_SOURCE/assets/HsKobo.sqlite.template" "$NICKEL_HS_DIR/"

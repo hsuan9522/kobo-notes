@@ -1,6 +1,11 @@
 #!/bin/sh
+set -e
 
 . /mnt/onboard/.adds/nickel-hs/notes/env.sh
+
+LOG_ACTION="Show latest highlights"
+trap logFailure EXIT
+logNote "START $LOG_ACTION"
 
 # 查詢最新的四筆高亮資料並格式化輸出
 data=$($SQLITE "$MY_DB" <<EOF
@@ -16,3 +21,4 @@ EOF
 
 # 輸出結果
 echo "$data"
+logNote "SUCCESS $LOG_ACTION"

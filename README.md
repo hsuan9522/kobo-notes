@@ -26,6 +26,10 @@ The package installs these entries through `.adds/nm/hsNotes`:
 - Reader and selection menus: show the four latest highlights.
 - Selection menu: sync the selected bookmark into the shared database and regenerate Markdown, or delete the latest saved note.
 
+To convert Simplified Chinese to Traditional Chinese while creating the text copy, create an empty `OPENCC` file in `/mnt/onboard/.adds/nickel-hs/notes/`. Remove that file to disable conversion. The package bundles the pure Python OpenCC module from `lib/opencc`; the script imports it from the installed Notes `lib/` directory and uses the `s2t` conversion.
+
+Notes records feature activity and errors in `/mnt/onboard/.adds/nickel-hs/logs/notes.log`. Entries include operation names and outcomes, not the contents of highlights or annotations.
+
 NickelMenu must be installed. The Notes package bundles the shared database, SQLite runtime, and bookmark-sync command it needs. Install [hs-kobo-backup](https://github.com/hsuan9522/hs-kobo-backup) separately if you also want its full backup features.
 
 ## Uninstall

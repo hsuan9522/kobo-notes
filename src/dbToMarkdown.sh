@@ -8,10 +8,13 @@ set -eu
 
 . /mnt/onboard/.adds/nickel-hs/notes/env.sh
 
+LOG_ACTION="Markdown export"
+trap logFailure EXIT
+logNote "START $LOG_ACTION"
 
 showStatus "Writing to Markdown..."
 
-echo "# Kobo Notes" > $EXPORT_NAME
+echo "# Kobo Notes" > "$EXPORT_NAME"
 
 
 SQL="WITH LatestBookmarks AS (
@@ -61,4 +64,9 @@ JOIN LatestBookmarks lb ON b.VolumeID = lb.VolumeID
 WHERE b.Type = 'highlight' OR b.Type = 'note'
 ORDER BY lb.latest_date DESC, b.title, b.dateCreated;"
 
-$SQLITE "$MY_DB" "$SQL" >> $EXPORT_NAME
+if $SQLITE "$MY_DB" "$SQL" >> "$EXPORT_NAME"; then
+    logNote "SUCCESS $LOG_ACTION"
+else
+    logNote "ERROR $LOG_ACTION sqlite failed"
+    exit 1
+fi
