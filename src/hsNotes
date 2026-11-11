@@ -1,4 +1,5 @@
-menu_item   :main   :筆記           :cmd_output       :9500:quiet:/mnt/onboard/.adds/nickel-hs/notes/markdownToTxt.sh
+menu_item   :main   :筆記           :cmd_output       :5000:quiet:/mnt/onboard/.adds/nickel-hs/backup/syncBookmarks.sh
+    chain_success    :cmd_output           :9500:quiet:/mnt/onboard/.adds/nickel-hs/notes/markdownToTxt.sh
     chain_success    :nickel_misc          :rescan_books
     chain_success    :cmd_output           :5000:quiet:sleep 3
     chain_success    :nickel_open          :library:all
